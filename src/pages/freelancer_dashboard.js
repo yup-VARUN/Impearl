@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './freelancer_dashboard.css';
 
@@ -17,11 +17,8 @@ export default function FreelancerDashboard() {
   const [tempBio, setTempBio] = useState('');
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchUserData();
-  }, []);
-
-  const fetchUserData = async () => {
+  // ✅ useCallback used here to fix the dependency warning
+  const fetchUserData = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -48,7 +45,11 @@ export default function FreelancerDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate]);
+
+  useEffect(() => {
+    fetchUserData();
+  }, [fetchUserData]);
 
   const handleProfilePictureChange = async (e) => {
     const file = e.target.files[0];
@@ -122,10 +123,15 @@ export default function FreelancerDashboard() {
         <div className="navbar-links">
           <a href="/dashboard">Dashboard</a>
           <a href="/orders">Orders</a>
-          <button onClick={() => {
-            localStorage.clear();
-            navigate('/login');
-          }} className="logout-btn">Logout</button>
+          <button
+            onClick={() => {
+              localStorage.clear();
+              navigate('/login');
+            }}
+            className="logout-btn"
+          >
+            Logout
+          </button>
         </div>
       </div>
 
@@ -161,7 +167,12 @@ export default function FreelancerDashboard() {
 
             <div className="info-item">
               <span className="info-label">Joined:</span>
-              <span className="info-value">{new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
+              <span className="info-value">
+                {new Date().toLocaleDateString('en-US', {
+                  month: 'long',
+                  year: 'numeric'
+                })}
+              </span>
             </div>
 
             <div className="info-item">
@@ -177,7 +188,12 @@ export default function FreelancerDashboard() {
             {userData.resume && (
               <div className="info-item">
                 <span className="info-label">Resume:</span>
-                <a href={userData.resume} target="_blank" rel="noopener noreferrer" className="resume-link">
+                <a
+                  href={userData.resume}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="resume-link"
+                >
                   View Resume
                 </a>
               </div>
@@ -197,12 +213,14 @@ export default function FreelancerDashboard() {
                 className="bio-textarea"
               />
               <div className="bio-actions">
-                <button onClick={handleBioSave} className="btn-save">Save</button>
-                <button 
+                <button onClick={handleBioSave} className="btn-save">
+                  Save
+                </button>
+                <button
                   onClick={() => {
                     setIsEditingBio(false);
                     setTempBio(userData.bio || '');
-                  }} 
+                  }}
                   className="btn-cancel"
                 >
                   Cancel
@@ -211,8 +229,13 @@ export default function FreelancerDashboard() {
             </div>
           ) : (
             <div className="bio-display">
-              <p>{userData.bio || 'Click edit to add information about yourself and your expertise.'}</p>
-              <button onClick={() => setIsEditingBio(true)} className="btn-edit">Edit Bio</button>
+              <p>
+                {userData.bio ||
+                  'Click edit to add information about yourself and your expertise.'}
+              </p>
+              <button onClick={() => setIsEditingBio(true)} className="btn-edit">
+                Edit Bio
+              </button>
             </div>
           )}
         </div>

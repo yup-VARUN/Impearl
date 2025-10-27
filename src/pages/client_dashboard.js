@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './client_dashboard.css';
 
@@ -18,12 +18,9 @@ export default function ClientDashboard() {
   const [tempBio, setTempBio] = useState('');
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Fetch user data from database
-    fetchUserData();
-  }, []);
-
-  const fetchUserData = async () => {
+  // ✅ useCallback ensures fetchUserData has a stable reference,
+  // so ESLint stops warning about missing dependencies.
+  const fetchUserData = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -50,7 +47,11 @@ export default function ClientDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate]);
+
+  useEffect(() => {
+    fetchUserData();
+  }, [fetchUserData]);
 
   const handleProfilePictureChange = async (e) => {
     const file = e.target.files[0];
@@ -125,10 +126,15 @@ export default function ClientDashboard() {
         <div className="navbar-links">
           <a href="/dashboard">Dashboard</a>
           <a href="/orders">Orders</a>
-          <button onClick={() => {
-            localStorage.clear();
-            navigate('/login');
-          }} className="logout-btn">Logout</button>
+          <button
+            onClick={() => {
+              localStorage.clear();
+              navigate('/login');
+            }}
+            className="logout-btn"
+          >
+            Logout
+          </button>
         </div>
       </div>
 
@@ -160,27 +166,24 @@ export default function ClientDashboard() {
 
           <div className="profile-info">
             <div className="info-item">
-              <span className="info-icon"></span>
               <span>Located in {userData.address || 'Not specified'}</span>
             </div>
-
             <div className="info-item">
-              <span className="info-icon"></span>
-              <span>Joined in {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
+              <span>
+                Joined in{' '}
+                {new Date().toLocaleDateString('en-US', {
+                  month: 'long',
+                  year: 'numeric'
+                })}
+              </span>
             </div>
-
             <div className="info-item">
-              <span className="info-icon"></span>
               <span>{userData.businessName || 'Business Name'}</span>
             </div>
-
             <div className="info-item">
-              <span className="info-icon"></span>
               <span>{userData.businessType || 'Business Type'}</span>
             </div>
-
             <div className="info-item">
-              <span className="info-icon"></span>
               <span>Company Size: {userData.companySize || 'Not specified'}</span>
             </div>
           </div>
@@ -199,12 +202,14 @@ export default function ClientDashboard() {
                 className="bio-textarea"
               />
               <div className="bio-actions">
-                <button onClick={handleBioSave} className="btn-save">Save</button>
-                <button 
+                <button onClick={handleBioSave} className="btn-save">
+                  Save
+                </button>
+                <button
                   onClick={() => {
                     setIsEditingBio(false);
                     setTempBio(userData.bio || '');
-                  }} 
+                  }}
                   className="btn-cancel"
                 >
                   Cancel
@@ -213,8 +218,13 @@ export default function ClientDashboard() {
             </div>
           ) : (
             <div className="bio-display">
-              <p>{userData.bio || 'Click edit to add information about your company and what you\'re looking for.'}</p>
-              <button onClick={() => setIsEditingBio(true)} className="btn-edit">Edit Bio</button>
+              <p>
+                {userData.bio ||
+                  "Click edit to add information about your company and what you're looking for."}
+              </p>
+              <button onClick={() => setIsEditingBio(true)} className="btn-edit">
+                Edit Bio
+              </button>
             </div>
           )}
         </div>
