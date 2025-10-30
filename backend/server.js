@@ -10,10 +10,13 @@ import Marketplace from "./models/Marketplace.js";
 dotenv.config();
 const app = express();
 
+const frontendUrl = process.env.FRONTEND_URL;
+
 // ✅ Allow frontend (3000) to reach backend (5000)
 app.use(
   cors({
     origin: [
+      frontendUrl,
       "https://damp-mummy-97w4r6w6x6ph9pwv-3000.app.github.dev",
       "https://damp-mummy-97w4r6w6x6ph9pwv-5000.app.github.dev",
     ],

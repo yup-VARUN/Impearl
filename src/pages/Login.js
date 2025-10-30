@@ -3,15 +3,15 @@ import "./signup_login.css"; // same CSS works for both
 
 export default function Login() {
   const [formData, setFormData] = useState({ email: "", password: "" });
-
+  const backendUrl = process.env.BACKEND_URL;
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
+  const loginUrl = `${backendUrl}/login`;
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:5000/login", {
+      const response = await fetch(loginUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

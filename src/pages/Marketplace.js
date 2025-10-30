@@ -4,10 +4,12 @@ function Marketplace() {
   const [items, setItems] = useState([]);
   const [message, setMessage] = useState("");
 
+  const backendUrl = process.env.BACKEND_URL;
+  const marketplaceUrl = `${backendUrl}/marketplace`;
   // Fetch all marketplace items
   const fetchItems = async () => {
     try {
-      const res = await fetch("http://localhost:5000/marketplace");
+      const res = await fetch(marketplaceUrl);
       const data = await res.json();
       setItems(data);
     } catch (err) {
@@ -19,7 +21,7 @@ function Marketplace() {
   // Add a new item
   const addItem = async () => {
     try {
-      const res = await fetch("http://localhost:5000/marketplace", {
+      const res = await fetch(marketplaceUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

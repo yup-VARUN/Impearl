@@ -11,7 +11,9 @@ export default function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("https://damp-mummy-97w4r6w6x6ph9pwv-5000.app.github.dev/register", {
+      const backendUrl = process.env.BACKEND_URL;
+      const registerUrl = `${backendUrl}/register`;
+      const response = await fetch(registerUrl, {
 
         method: "POST",
         headers: { "Content-Type": "application/json" },
